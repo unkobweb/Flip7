@@ -1,4 +1,12 @@
-type Card = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | '11' | '12' | 'STOP' | '3_IN_A_ROW' | 'SECOND_CHANCE' | '+2' | '+4' | '+6' | '+8' | '+10' | 'x2';
+export const SCORE_CARDS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] as const
+export const ACTION_CARDS = ['STOP', '3_IN_A_ROW', 'SECOND_CHANCE'] as const
+export const BONUS_CARDS = ['+2', '+4', '+6', '+8', '+10', 'x2'] as const
+
+export type ScoreCard = (typeof SCORE_CARDS)[number]
+export type ActionCard = (typeof ACTION_CARDS)[number]
+export type BonusCard = (typeof BONUS_CARDS)[number]
+
+export type Card = ScoreCard | ActionCard | BonusCard
 
 export default class Cards {
   public cards: Card[] = [];
@@ -26,17 +34,17 @@ export default class Cards {
     }
   }
 
-  drawCard() {
+  drawCard(): Card {
     if (this.cards.length === 0) {
       console.log('Reshuffling deck... (No card left)');
       this.cards = [...this.bin];
       this.bin = [];
       this.shuffle();
     }
-    return this.cards.pop();
+    return this.cards.pop()!;
   }
 
-  addCardToBin(card: Card) {
-    this.bin.push(card);
+  addCardsToBin(...cards: Card[]) {
+    this.bin.push(...cards);
   }
 }
