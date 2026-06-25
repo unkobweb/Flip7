@@ -2,6 +2,8 @@ import Cards, { SCORE_CARDS } from "./cards.ts"
 import { select } from '@inquirer/prompts';
 import Player from "./player.ts";
 import { isScoreCard, promptMessage, wait } from "./utils.ts";
+import Table from 'cli-table3';
+import chalk from 'chalk';
 
 export default class Game {
   private round = 1;
@@ -25,10 +27,10 @@ export default class Game {
         continue;
       }
       for (const player of notStoppedPlayers) {
+        if (player.isStopped) continue;
         await wait(1);
         console.clear()
-        console.log(`${player.name}'s turn`);
-        console.log(player.name+"'s hand :"+' '+player.hand+'\n\n');
+        this.displayScores()
 
         let move = 'draw'
 
@@ -48,6 +50,23 @@ export default class Game {
         }
       }
     }
+  }
+
+  private displayScores() {
+    const table = new Table({
+      head: ['Player', 'Score', 'Hand'],
+      colWidths: [20, 10, 50]
+    });
+    for (const player of this.players) {
+      let hand = player.hand.join(', ');
+      let handStr = hand;
+      if (player.isStopped) {
+        handStr = [hand, chalk.italic.gray('(stopped)')].join(' - ');
+      }
+      table.push([player.name, player.score, handStr])
+    }
+    console.log(chalk.red('Round ' + this.round))
+    console.log(table.toString())
   }
 
   private finishRound() {
